@@ -70,7 +70,7 @@ public class GridHubResource {
 
     @GET
     @Timed
-    @Path("/info")
+    @Path("/status")
     public String infoHub() {
         throw new NotImplementedException("Not implemented yet");
     }
