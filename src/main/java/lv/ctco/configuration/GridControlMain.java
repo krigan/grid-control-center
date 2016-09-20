@@ -5,18 +5,15 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import lv.ctco.beans.Hub;
-import lv.ctco.beans.Node;
 import lv.ctco.resources.GridControlResource;
 import lv.ctco.resources.GridHubResource;
 import lv.ctco.resources.GridNodeResource;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 public class GridControlMain extends Application<GridControlConfiguration> {
 
     public static Hub hub;
-    public static List<Node> nodes;
 
     public static void main(String[] args) throws Exception {
         new GridControlMain().run(args);
@@ -42,8 +39,7 @@ public class GridControlMain extends Application<GridControlConfiguration> {
     }
 
     private void initGrid() {
-        nodes = new ArrayList<>();
-        hub = new Hub(nodes);
+        hub = new Hub(new HashSet<>());
     }
 
 }

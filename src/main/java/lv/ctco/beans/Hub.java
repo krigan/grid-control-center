@@ -1,23 +1,23 @@
 package lv.ctco.beans;
 
-import java.util.List;
+import java.util.Set;
 
 public class Hub {
 
-    private List<Node> nodeList;
+    private Set<Node> nodeList;
     private String startParams;
     private boolean isRunning;
 
-    public Hub(List<Node> nodeList) {
+    public Hub(Set<Node> nodeList) {
         this.nodeList = nodeList;
         isRunning = false;
     }
 
-    public List<Node> getNodeList() {
+    public Set<Node> getNodeList() {
         return nodeList;
     }
 
-    public void setNodeList(List<Node> nodeList) {
+    public void setNodeList(Set<Node> nodeList) {
         this.nodeList = nodeList;
     }
 
