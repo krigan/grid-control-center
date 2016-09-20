@@ -1,6 +1,8 @@
 package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import lv.ctco.beans.Hub;
+import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
 import org.apache.commons.lang3.NotImplementedException;
@@ -11,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.List;
 
 @Path("/hub")
 @Produces(MediaType.TEXT_HTML)
@@ -71,7 +74,7 @@ public class GridHubResource {
     @GET
     @Timed
     @Path("/status")
-    public String infoHub() {
+    public Hub infoHub() {
         throw new NotImplementedException("Not implemented yet");
     }
 }
