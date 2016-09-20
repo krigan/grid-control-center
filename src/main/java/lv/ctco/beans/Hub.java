@@ -4,7 +4,14 @@ import java.util.List;
 
 public class Hub {
 
-    public List<Node> nodeList;
+    private List<Node> nodeList;
+    private String startParams;
+    private boolean isRunning;
+
+    public Hub(List<Node> nodeList) {
+        this.nodeList = nodeList;
+        isRunning = false;
+    }
 
     public List<Node> getNodeList() {
         return nodeList;
@@ -12,5 +19,25 @@ public class Hub {
 
     public void setNodeList(List<Node> nodeList) {
         this.nodeList = nodeList;
+    }
+
+    public String getStartParams() {
+        return startParams;
+    }
+
+    public void setStartParams(String startParams) {
+        this.startParams = startParams;
+    }
+
+    public void setStartCommand(String startParams) {
+        this.startParams = startParams;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        isRunning = running;
     }
 }

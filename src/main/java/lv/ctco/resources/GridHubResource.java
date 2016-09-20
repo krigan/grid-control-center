@@ -1,11 +1,9 @@
 package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import lv.ctco.beans.Hub;
-import lv.ctco.beans.Node;
+import com.google.gson.Gson;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
-import org.apache.commons.lang3.NotImplementedException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,16 +11,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.List;
+
+import static lv.ctco.configuration.GridControlMain.hub;
 
 @Path("/hub")
 @Produces(MediaType.TEXT_HTML)
 public class GridHubResource {
 
-    private GridControlConfiguration configuration;
     private static final String SELENIUM_SERVER_STANDALONE = "selenium-server-standalone-2.52.0.jar";
     String startCommand;
     Process process;
+    private GridControlConfiguration configuration;
 
     public GridHubResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
@@ -41,6 +40,8 @@ public class GridHubResource {
             try {
                 startCommand = "java -jar " + SELENIUM_SERVER_STANDALONE + " " + params;
                 process = Runtime.getRuntime().exec(startCommand);
+                hub.setStartCommand(startCommand);
+                hub.setRunning(true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -54,6 +55,7 @@ public class GridHubResource {
     public String stopHub() {
         if (process!=null) {
             process.destroy();
+            hub.setRunning(false);
         }
         return "Hub stopped";
     }
@@ -63,8 +65,10 @@ public class GridHubResource {
     @Path("/restart")
     public String restartHub() {
         process.destroy();
+        hub.setRunning(true);
         try {
             process = Runtime.getRuntime().exec(startCommand);
+            hub.setRunning(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -74,8 +78,8 @@ public class GridHubResource {
     @GET
     @Timed
     @Path("/status")
-    public Hub infoHub() {
-        throw new NotImplementedException("Not implemented yet");
+    public String statusHub() {
+        return new Gson().toJson(hub);
     }
 }
 
