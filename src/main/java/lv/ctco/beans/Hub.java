@@ -1,5 +1,6 @@
 package lv.ctco.beans;
 
+import java.net.URL;
 import java.util.Set;
 
 public class Hub {
@@ -7,6 +8,15 @@ public class Hub {
     private Set<Node> nodeList;
     private String startParams;
     private boolean isRunning;
+    private URL url;
+
+    public URL getUrl() {
+        return url;
+    }
+
+    public void setUrl(URL url) {
+        this.url = url;
+    }
 
     public Hub(Set<Node> nodeList) {
         this.nodeList = nodeList;

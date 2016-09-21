@@ -16,12 +16,10 @@ import static lv.ctco.configuration.GridControlMain.hub;
 
 @Path("/hub")
 @Produces(MediaType.TEXT_HTML)
-public class GridHubResource {
+public class GridHubResource extends GridInfrastructure{
 
-    private static final String SELENIUM_SERVER_STANDALONE = "selenium-server-standalone-2.52.0.jar";
-    String startCommand;
-    Process process;
     private GridControlConfiguration configuration;
+    private String startCommand;
 
     public GridHubResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
