@@ -1,22 +1,9 @@
 package lv.ctco.beans;
 
-import lv.ctco.enums.Browser;
-
-import java.util.Set;
-
 public class Node {
 
-    private Set<Browser> browsers;
-    private Hub hub;
     private boolean isRunning;
-
-    public Hub getHub() {
-        return hub;
-    }
-
-    public void setHub(Hub hub) {
-        this.hub = hub;
-    }
+    private String startCommand;
 
     public boolean isRunning() {
         return isRunning;
@@ -26,11 +13,11 @@ public class Node {
         isRunning = running;
     }
 
-    public Set<Browser> getBrowsers() {
-        return browsers;
+    public String getStartCommand() {
+        return startCommand;
     }
 
-    public void setBrowsers(Set<Browser> browsers) {
-        this.browsers = browsers;
+    public void setStartCommand(String startCommand) {
+        this.startCommand = startCommand;
     }
 }

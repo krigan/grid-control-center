@@ -44,7 +44,7 @@ public class GridHubResource {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return "Hub started";
+            return "Hub started with start command " + startCommand;
         }
     }
 

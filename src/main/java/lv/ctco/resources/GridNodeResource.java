@@ -1,6 +1,7 @@
 package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.gson.Gson;
 import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
@@ -10,13 +11,16 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
+import static lv.ctco.configuration.GridControlMain.hub;
+
 @Path("/node")
 @Produces(MediaType.TEXT_HTML)
 public class GridNodeResource {
 
-    private StringBuilder startCommand;
+    private String startCommand;
     private Process process;
     private GridControlConfiguration configuration;
+    private Node node;
 
     public GridNodeResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
@@ -26,24 +30,22 @@ public class GridNodeResource {
     @Timed
     @Path("/start")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Node startNode(Node node) {
+    public String startNode(@QueryParam("params") String params) {
+        node = new Node();
         if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
             node.setRunning(false);
-            return node;
+            return "Node not started. " + configuration.getSeleniumJarFileName() + " not found";
         } else {
             try {
-                startCommand = new StringBuilder("java -jar").append(configuration.getSeleniumJarFileName());
-
-                if (node.getBrowsers().size() > 0) {
-                    node.getBrowsers().forEach(browser -> startCommand.append(" -browser browserName=").append(browser.getName()));
-                }
-                startCommand.append(" -hub ").append(node.getHub().getUrl().toString());
-                process = Runtime.getRuntime().exec(startCommand.toString());
+                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + " " + params;
+                process = Runtime.getRuntime().exec(startCommand);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             node.setRunning(true);
-            return node;
+            node.setStartCommand(startCommand);
+            hub.addNode(node);
+            return "Node started with start command " + startCommand;
         }
     }
 
@@ -53,6 +55,8 @@ public class GridNodeResource {
     public String stopNode() {
         if (process != null) {
             process.destroy();
+            node.setRunning(false);
+            hub.removeNode(node);
         }
         return "Node stopped";
     }
@@ -79,6 +83,13 @@ public class GridNodeResource {
             }
         }
         return "Browser closed";
+    }
+
+    @GET
+    @Timed
+    @Path("/status")
+    public String statusHub() {
+        return new Gson().toJson(node);
     }
 
     private void killBrowser(String browser) {
