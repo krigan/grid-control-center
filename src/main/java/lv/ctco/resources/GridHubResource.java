@@ -16,10 +16,11 @@ import static lv.ctco.configuration.GridControlMain.hub;
 
 @Path("/hub")
 @Produces(MediaType.TEXT_HTML)
-public class GridHubResource extends GridInfrastructure{
+public class GridHubResource {
 
     private GridControlConfiguration configuration;
     private String startCommand;
+    private Process process;
 
     public GridHubResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
@@ -29,14 +30,14 @@ public class GridHubResource extends GridInfrastructure{
     @Timed
     @Path("/start")
     public String startHub(@QueryParam("params") String params) {
-        if (!FileUtilsHelper.isFileExist(SELENIUM_SERVER_STANDALONE)) {
+        if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
             return "No selenium jar found";
         } else {
             if (params == null) {
                 params = "";
             }
             try {
-                startCommand = "java -jar " + SELENIUM_SERVER_STANDALONE + " " + params;
+                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + " " + params;
                 process = Runtime.getRuntime().exec(startCommand);
                 hub.setStartCommand(startCommand);
                 hub.setRunning(true);

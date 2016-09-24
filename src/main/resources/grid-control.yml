@@ -5,3 +5,7 @@ server:
   adminConnectors:
     - type: http
       port: 4001
+
+os: "linux"
+mode: "node"
+seleniumJarFileName: "selenium-server-standalone-2.52.0.jar"

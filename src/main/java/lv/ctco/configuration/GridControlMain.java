@@ -35,7 +35,7 @@ public class GridControlMain extends Application<GridControlConfiguration> {
         environment.healthChecks().register("HealthCheck", new GridControlHealthCheck());
         environment.jersey().register(new GridControlResource(configuration));
         environment.jersey().register(new GridHubResource(configuration));
-        environment.jersey().register(new GridNodeResource());
+        environment.jersey().register(new GridNodeResource(configuration));
     }
 
     private void initGrid() {
