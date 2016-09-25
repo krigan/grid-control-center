@@ -2,9 +2,12 @@ package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.gson.Gson;
+import lv.ctco.beans.HubModel;
 import lv.ctco.beans.Node;
+import lv.ctco.beans.NodeModel;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
+import lv.ctco.helpers.ParamHelper;
 import org.apache.commons.lang3.NotImplementedException;
 
 import javax.ws.rs.*;
@@ -27,25 +30,23 @@ public class GridNodeResource {
         this.configuration = configuration;
     }
 
-    @GET
+    @POST
     @Timed
     @Path("/start")
     @Consumes(MediaType.APPLICATION_JSON)
-    public String startNode(@QueryParam("params") Optional<String> params) {
-        node = new Node();
+    public String startHub(NodeModel nodeModel) {
         if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
-            node.setRunning(false);
-            return "Node not started. " + configuration.getSeleniumJarFileName() + " not found";
+            return "No selenium jar found";
         } else {
             try {
-                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + " " ;
+                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + ParamHelper.getNodeStartParameters(nodeModel);
                 process = Runtime.getRuntime().exec(startCommand);
+
+                hub.setStartCommand(startCommand);
+                hub.setRunning(true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            node.setRunning(true);
-            node.setStartCommand(startCommand);
-            hub.addNode(node);
             return "Node started with start command " + startCommand;
         }
     }

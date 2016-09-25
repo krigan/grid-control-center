@@ -34,7 +34,7 @@ public class GridHubResource {
             return "No selenium jar found";
         } else {
             try {
-                startCommand = "java -jar " + configuration.getSeleniumJarFileName() +ParamHelper.getHubStartParameters(hubModel);
+                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + ParamHelper.getHubStartParameters(hubModel);
                 process = Runtime.getRuntime().exec(startCommand);
 
                 hub.setStartCommand(startCommand);
