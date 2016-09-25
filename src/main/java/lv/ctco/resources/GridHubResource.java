@@ -2,13 +2,12 @@ package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.gson.Gson;
+import lv.ctco.beans.HubModel;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
+import lv.ctco.helpers.ParamHelper;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
@@ -26,19 +25,18 @@ public class GridHubResource {
         this.configuration = configuration;
     }
 
-    @GET
+    @POST
     @Timed
     @Path("/start")
-    public String startHub(@QueryParam("params") String params) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String startHub(HubModel hubModel) {
         if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
             return "No selenium jar found";
         } else {
-            if (params == null) {
-                params = "";
-            }
             try {
-                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + " " + params;
+                startCommand = "java -jar " + configuration.getSeleniumJarFileName() +ParamHelper.getHubStartParameters(hubModel);
                 process = Runtime.getRuntime().exec(startCommand);
+
                 hub.setStartCommand(startCommand);
                 hub.setRunning(true);
             } catch (IOException e) {

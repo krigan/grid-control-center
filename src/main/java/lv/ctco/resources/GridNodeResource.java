@@ -10,6 +10,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.Optional;
 
 import static lv.ctco.configuration.GridControlMain.hub;
 
@@ -30,14 +31,14 @@ public class GridNodeResource {
     @Timed
     @Path("/start")
     @Consumes(MediaType.APPLICATION_JSON)
-    public String startNode(@QueryParam("params") String params) {
+    public String startNode(@QueryParam("params") Optional<String> params) {
         node = new Node();
         if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
             node.setRunning(false);
             return "Node not started. " + configuration.getSeleniumJarFileName() + " not found";
         } else {
             try {
-                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + " " + params;
+                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + " " ;
                 process = Runtime.getRuntime().exec(startCommand);
             } catch (IOException e) {
                 e.printStackTrace();
