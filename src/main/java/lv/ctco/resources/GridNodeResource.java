@@ -8,7 +8,11 @@ import lv.ctco.helpers.FileUtilsHelper;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import static lv.ctco.configuration.GridControlMain.hub;
 
@@ -87,17 +91,16 @@ public class GridNodeResource {
     @GET
     @Timed
     @Path("/status")
-    public String statusHub() {
+    public String statusNode() {
         return new Gson().toJson(node);
     }
 
     private void killBrowser(String browser) {
+        browser = browser.toLowerCase();
         String os = configuration.getOs();
         if (os.equals("linux")) {
             try {
-                // TODO verify kill command
-                Runtime.getRuntime().exec("pkill " + browser);
-                Runtime.getRuntime().exec("pkill " + browser);
+                Runtime.getRuntime().exec("pkill -f " + browser);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -105,15 +108,15 @@ public class GridNodeResource {
         if (os.equals("windows")) {
             try {
                 if (browser.contains("chrome")) {
-                    Runtime.getRuntime().exec("taskkill /f /im chrome.exe");
-                    Runtime.getRuntime().exec("taskkill /f /im chromeDriverServer.exe");
+                    Runtime.getRuntime().exec("TASKKILL /F /IM chrome.exe /T");
+                    Runtime.getRuntime().exec("TASKKILL /F /IM chromeDriverServer.exe /T");
                 }
                 if (browser.contains("firefox")) {
-                    Runtime.getRuntime().exec("TASKKILL /F /IM firefox.exe");
+                    Runtime.getRuntime().exec("TASKKILL /F /IM firefox.exe /t");
                 }
                 if (browser.contains("ie")) {
-                    Runtime.getRuntime().exec("taskkill /f /im iexplore.exe");
-                    Runtime.getRuntime().exec("taskkill /f /im IEDriverServer.exe");
+                    Runtime.getRuntime().exec("TASKKILL /F /IM iexplore.exe /t");
+                    Runtime.getRuntime().exec("TASKKILL /F /IM IEDriverServer.exe /t");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -121,4 +124,44 @@ public class GridNodeResource {
         }
     }
 
+
+    @GET
+    @Timed
+    @Path("/browserList")
+    public String getBrowsersList() throws IOException {
+        String os = configuration.getOs();
+        if (os.equals("linux")) {
+            Process process = Runtime.getRuntime().exec("ps -e");
+            return getBrowserFilteredList(process);
+        }
+        if (os.equals("windows")) {
+            Process process = Runtime.getRuntime().exec
+                    (System.getenv("windir") + "\\system32\\" + "tasklist.exe");
+            return getBrowserFilteredList(process);
+        }
+        return "Unable to define open browsers";
+    }
+
+    private String getBrowserFilteredList(Process process) throws IOException {
+        BufferedReader stdInput = new BufferedReader(new
+                InputStreamReader(process.getInputStream()));
+
+        String s;
+        List<String> processes = new ArrayList<>();
+        while ((s = stdInput.readLine()) != null) {
+            processes.add(s);
+        }
+        stdInput.close();
+        List<String> openBrowsersProcesses = new ArrayList<>();
+        processes
+                .stream()
+                .filter(p -> p.contains("chrome") || p.contains("firefox") || p.contains("iexplore"))
+                .forEach(openBrowsersProcesses::add);
+        openBrowsersProcesses.forEach(System.out::println);
+        String result = "";
+        for (String str : openBrowsersProcesses) {
+            result += str + " \r\n";
+        }
+        return result;
+    }
 }
