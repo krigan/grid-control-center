@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
-import org.apache.commons.lang3.NotImplementedException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -104,8 +103,22 @@ public class GridNodeResource {
             }
         }
         if (os.equals("windows")) {
-            // TODO implement me here
-            throw new NotImplementedException("Not implemented yet");
+            try {
+                if (browser.contains("chrome")) {
+                    Runtime.getRuntime().exec("taskkill /f /im chrome.exe");
+                    Runtime.getRuntime().exec("taskkill /f /im chromeDriverServer.exe");
+                }
+                if (browser.contains("firefox")) {
+                    Runtime.getRuntime().exec("TASKKILL /F /IM firefox.exe");
+                }
+                if (browser.contains("ie")) {
+                    Runtime.getRuntime().exec("taskkill /f /im iexplore.exe");
+                    Runtime.getRuntime().exec("taskkill /f /im IEDriverServer.exe");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 }
