@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
+import lv.ctco.helpers.HostHelper;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.*;
@@ -38,6 +39,8 @@ public class GridNodeResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public String startNode(@QueryParam("params") String params) {
         node = new Node();
+        node.setHost(HostHelper.getHostName());
+        node.setPort(HostHelper.getPort(configuration));
         if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
             node.setRunning(false);
             return "Node not started. " + configuration.getSeleniumJarFileName() + " not found";

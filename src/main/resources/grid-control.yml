@@ -10,3 +10,8 @@ os: "windows"
 mode: "node"
 javaPath: "java"
 seleniumJarFileName: "selenium-server-standalone-2.52.0.jar"
+
+assets:
+  overrides:
+    /assets/css: src/main/resources/assets/css
+    /assets/js: src/main/resources/assets/js

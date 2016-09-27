@@ -26,27 +26,23 @@ public class GridHubResource {
 
     public GridHubResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
-        startCommandPrefix = configuration.getJavaPath() + " -jar " + configuration.getSeleniumJarFileName() + " ";
+        startCommandPrefix = configuration.getJavaPath() + configuration.getSeleniumJarFileName() + " ";
     }
 
     @GET
     @Timed
     @Path("/start")
-    public String startHub(@QueryParam("params") String params) {
+    public String startHub(@QueryParam("params") String params) throws IOException {
         if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
             return "No selenium jar found";
         } else {
             if (params == null) {
                 params = "";
             }
-            try {
-                startCommand = startCommandPrefix + params;
-                process = Runtime.getRuntime().exec(startCommand);
-                hub.setStartCommand(startCommand);
-                hub.setRunning(true);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            startCommand = params;
+            process = Runtime.getRuntime().exec(startCommand);
+            hub.setStartCommand(startCommand);
+            hub.setRunning(true);
             return "Hub started with start command " + startCommand;
         }
     }
@@ -55,7 +51,7 @@ public class GridHubResource {
     @Timed
     @Path("/stop")
     public String stopHub() {
-        if (process!=null) {
+        if (process != null) {
             process.destroy();
             hub.setRunning(false);
         }
@@ -69,7 +65,7 @@ public class GridHubResource {
         process.destroy();
         hub.setRunning(false);
         try {
-            startCommand = startCommandPrefix + params;
+            startCommand = params;
             process = Runtime.getRuntime().exec(startCommand);
             hub.setRunning(true);
         } catch (IOException e) {

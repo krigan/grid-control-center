@@ -1,6 +1,7 @@
 package lv.ctco.configuration;
 
 import io.dropwizard.Application;
+import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
@@ -9,7 +10,9 @@ import lv.ctco.resources.GridControlResource;
 import lv.ctco.resources.GridHubResource;
 import lv.ctco.resources.GridNodeResource;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class GridControlMain extends Application<GridControlConfiguration> {
 
@@ -27,6 +30,9 @@ public class GridControlMain extends Application<GridControlConfiguration> {
     @Override
     public void initialize(Bootstrap<GridControlConfiguration> bootstrap) {
         bootstrap.addBundle(new ViewBundle());
+        Map<String, String> map = new HashMap<>();
+        map.put("/assets", "/assets");
+        bootstrap.addBundle(new ConfiguredAssetsBundle(map));
     }
 
     @Override
