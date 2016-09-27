@@ -21,6 +21,10 @@ public class GridControlConfiguration extends Configuration {
     @JsonProperty
     private String seleniumJarFileName;
 
+    @NotEmpty
+    @JsonProperty
+    private String javaPath;
+
     public String getOs() {
         return os;
     }
@@ -31,5 +35,9 @@ public class GridControlConfiguration extends Configuration {
 
     public String getSeleniumJarFileName() {
         return seleniumJarFileName;
+    }
+
+    public String getJavaPath() {
+        return javaPath;
     }
 }

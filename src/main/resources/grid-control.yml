@@ -6,6 +6,7 @@ server:
     - type: http
       port: 4001
 
-os: "linux"
+os: "windows"
 mode: "node"
+javaPath: "java"
 seleniumJarFileName: "selenium-server-standalone-2.52.0.jar"

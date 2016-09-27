@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,9 +22,11 @@ public class GridHubResource {
     private GridControlConfiguration configuration;
     private String startCommand;
     private Process process;
+    private String startCommandPrefix;
 
     public GridHubResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
+        startCommandPrefix = configuration.getJavaPath() + " -jar " + configuration.getSeleniumJarFileName() + " ";
     }
 
     @GET
@@ -37,7 +40,7 @@ public class GridHubResource {
                 params = "";
             }
             try {
-                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + " " + params;
+                startCommand = startCommandPrefix + params;
                 process = Runtime.getRuntime().exec(startCommand);
                 hub.setStartCommand(startCommand);
                 hub.setRunning(true);
@@ -62,10 +65,11 @@ public class GridHubResource {
     @GET
     @Timed
     @Path("/restart")
-    public String restartHub() {
+    public String restartHub(@Nullable @QueryParam("params") String params) {
         process.destroy();
-        hub.setRunning(true);
+        hub.setRunning(false);
         try {
+            startCommand = startCommandPrefix + params;
             process = Runtime.getRuntime().exec(startCommand);
             hub.setRunning(true);
         } catch (IOException e) {

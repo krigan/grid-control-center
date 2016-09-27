@@ -6,6 +6,7 @@ import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.BufferedReader;
@@ -21,12 +22,14 @@ import static lv.ctco.configuration.GridControlMain.hub;
 public class GridNodeResource {
 
     private String startCommand;
+    private String startCommandPrefix;
     private Process process;
     private GridControlConfiguration configuration;
     private Node node;
 
     public GridNodeResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
+        startCommandPrefix = configuration.getJavaPath() + " -jar " + configuration.getSeleniumJarFileName() + " ";
     }
 
     @GET
@@ -62,6 +65,19 @@ public class GridNodeResource {
             hub.removeNode(node);
         }
         return "Node stopped";
+    }
+
+    @GET
+    @Timed
+    @Path("/restart")
+    public String restartHub(@Nullable @QueryParam("params") String params) throws IOException {
+        process.destroy();
+        node.setRunning(false);
+        hub.removeNode(node);
+        startCommand = startCommandPrefix + params;
+        process = Runtime.getRuntime().exec(startCommand);
+        node.setRunning(true);
+        return "Hub restarted";
     }
 
     @GET
