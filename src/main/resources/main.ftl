@@ -18,16 +18,16 @@
         <input type="submit" title="Start hub" value="Start hub"/>
     </form>
 </#if>
-</div>
-<br>
+    <br>
 <#if nodes?size gt 0>
-<ul>
-    <#list nodes as node>
+    <ul>
+        <#list nodes as node>
         <#assign nodeId = node?index>
         <#include "node.ftl">
     </#list>
-</ul>
+    </ul>
 <#else>
-<p>Nodes not launched yet</p>
+    <p>Nodes not launched yet</p>
 </#if>
+</div>
 <#include "common/footer.ftl">

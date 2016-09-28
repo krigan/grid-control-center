@@ -1,15 +1,15 @@
 server:
   applicationConnectors:
     - type: http
-      port: 4000
+      port: 4003
   adminConnectors:
     - type: http
-      port: 4001
+      port: 4002
 
 os: "windows"
 mode: "node"
-javaPath: "java"
 seleniumJarFileName: "selenium-server-standalone-2.52.0.jar"
+gridControlCenterUrl: "http://127.0.0.1:4000"
 
 assets:
   overrides:

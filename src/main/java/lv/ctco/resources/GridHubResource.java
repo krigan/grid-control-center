@@ -22,11 +22,9 @@ public class GridHubResource {
     private GridControlConfiguration configuration;
     private String startCommand;
     private Process process;
-    private String startCommandPrefix;
 
     public GridHubResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
-        startCommandPrefix = configuration.getJavaPath() + configuration.getSeleniumJarFileName() + " ";
     }
 
     @GET

@@ -7,6 +7,12 @@ public class Node {
     private String host;
     private int port;
 
+    public Node(String host, int port, boolean isRunning) {
+        this.host = host;
+        this.port = port;
+        this.isRunning = isRunning;
+    }
+
     public boolean isRunning() {
         return isRunning;
     }

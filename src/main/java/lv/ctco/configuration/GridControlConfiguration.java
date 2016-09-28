@@ -29,7 +29,7 @@ public class GridControlConfiguration extends Configuration implements AssetsBun
     private String seleniumJarFileName;
     @NotEmpty
     @JsonProperty
-    private String javaPath;
+    private String gridControlCenterUrl;
 
     @Override
     public AssetsConfiguration getAssetsConfiguration() {
@@ -48,7 +48,7 @@ public class GridControlConfiguration extends Configuration implements AssetsBun
         return seleniumJarFileName;
     }
 
-    public String getJavaPath() {
-        return javaPath;
+    public String getGridControlCenterUrl() {
+        return gridControlCenterUrl;
     }
 }

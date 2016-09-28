@@ -8,7 +8,13 @@ import lv.ctco.helpers.FileUtilsHelper;
 import lv.ctco.helpers.HostHelper;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,40 +28,46 @@ import static lv.ctco.configuration.GridControlMain.hub;
 @Produces(MediaType.TEXT_HTML)
 public class GridNodeResource {
 
-    private String startCommand;
-    private String startCommandPrefix;
     private Process process;
     private GridControlConfiguration configuration;
     private Node node;
 
     public GridNodeResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
-        startCommandPrefix = configuration.getJavaPath() + " -jar " + configuration.getSeleniumJarFileName() + " ";
     }
 
     @GET
     @Timed
     @Path("/start")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public String startNode(@QueryParam("params") String params) {
-        node = new Node();
-        node.setHost(HostHelper.getHostName());
-        node.setPort(HostHelper.getPort(configuration));
-        if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
-            node.setRunning(false);
-            return "Node not started. " + configuration.getSeleniumJarFileName() + " not found";
-        } else {
-            try {
-                startCommand = "java -jar " + configuration.getSeleniumJarFileName() + " " + params;
-                process = Runtime.getRuntime().exec(startCommand);
-            } catch (IOException e) {
-                e.printStackTrace();
+    public String startNode(@QueryParam("host") String host, @QueryParam("port") int port, @QueryParam("params") String params) {
+        String mode = configuration.getMode();
+        node = new Node(HostHelper.getHostName(), HostHelper.getPort(configuration), false);
+        if (mode.equals("node")) {
+            if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
+                return "Node not started. " + configuration.getSeleniumJarFileName() + " not found";
+            } else {
+                try {
+                    process = Runtime.getRuntime().exec(params);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                node.setRunning(true);
+                node.setStartCommand(params);
+                return "Node started with start command " + params;
             }
-            node.setRunning(true);
-            node.setStartCommand(startCommand);
-            hub.addNode(node);
-            return "Node started with start command " + startCommand;
         }
+        if (mode.equals("hub")) {
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target("http://" + host + ":" + port + "/node/start");
+            target
+                    .queryParam("params", params)
+                    .request()
+                    .get();
+            node.setRunning(true);
+            node.setStartCommand(params);
+            hub.addNode(node);
+        }
+        return "Unknown mode";
     }
 
     @GET
@@ -65,7 +77,6 @@ public class GridNodeResource {
         if (process != null) {
             process.destroy();
             node.setRunning(false);
-            hub.removeNode(node);
         }
         return "Node stopped";
     }
@@ -77,8 +88,7 @@ public class GridNodeResource {
         process.destroy();
         node.setRunning(false);
         hub.removeNode(node);
-        startCommand = startCommandPrefix + params;
-        process = Runtime.getRuntime().exec(startCommand);
+        process = Runtime.getRuntime().exec(params);
         node.setRunning(true);
         return "Hub restarted";
     }

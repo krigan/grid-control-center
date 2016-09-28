@@ -6,10 +6,14 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import lv.ctco.beans.Hub;
+import lv.ctco.helpers.HostHelper;
 import lv.ctco.resources.GridControlResource;
 import lv.ctco.resources.GridHubResource;
 import lv.ctco.resources.GridNodeResource;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,15 +41,28 @@ public class GridControlMain extends Application<GridControlConfiguration> {
 
     @Override
     public void run(GridControlConfiguration configuration, Environment environment) {
-        initGrid();
+        initGrid(configuration);
         environment.healthChecks().register("HealthCheck", new GridControlHealthCheck());
         environment.jersey().register(new GridControlResource(configuration));
         environment.jersey().register(new GridHubResource(configuration));
         environment.jersey().register(new GridNodeResource(configuration));
     }
 
-    private void initGrid() {
+    private void initGrid(GridControlConfiguration configuration) {
         hub = new Hub(new HashSet<>());
+        if (configuration.getMode().equals("node")) {
+            String controlCenterUrl = configuration.getGridControlCenterUrl();
+            if (controlCenterUrl == null || controlCenterUrl.isEmpty()) {
+                throw new IllegalStateException("gridControlCenterUrl param need to be defined in configuration");
+            }
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target(controlCenterUrl + "/register");
+            target
+                    .queryParam("host", HostHelper.getHostName())
+                    .queryParam("port", HostHelper.getPort(configuration))
+                    .request()
+                    .get();
+        }
     }
 
 }
