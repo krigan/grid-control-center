@@ -2,6 +2,7 @@ package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.gson.Gson;
+import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
 
@@ -10,6 +11,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
@@ -77,6 +81,50 @@ public class GridHubResource {
     @Path("/status")
     public String statusHub() {
         return new Gson().toJson(hub);
+    }
+
+    @GET
+    @Timed
+    @Path("/startNode")
+    public String startNode(@QueryParam("host") String host, @QueryParam("port") int port, @QueryParam("params") String params) {
+        Node node = new Node(host, port, false);
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("http://" + host + ":" + port + "/node/start");
+        target
+                .queryParam("params", params)
+                .request()
+                .get();
+        node.setRunning(true);
+        node.setStartCommand(params);
+        hub.removeNode(hub.getNodeList().stream().filter(n -> n.getHost().equals(node.getHost()) && n.getPort() == node.getPort()).findFirst().get());
+        hub.addNode(node);
+        return "Node started";
+    }
+
+    @GET
+    @Timed
+    @Path("/stopNode")
+    public String stopNode(@QueryParam("host") String host, @QueryParam("port") int port) {
+        Node node = hub
+                .getNodeList()
+                .stream()
+                .filter(n -> n.getHost().equals(host) && n.getPort() == port)
+                .findFirst()
+                .get();
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("http://" + host + ":" + port + "/node/stop");
+        target
+                .request()
+                .get();
+        node.setRunning(false);
+//        hub.removeNode(hub
+//                .getNodeList()
+//                .stream()
+//                .filter(n -> n.getHost().equals(node.getHost()) && n.getPort() == node.getPort())
+//                .findFirst()
+//                .get());
+//        hub.addNode(node);
+        return "Node started";
     }
 }
 

@@ -66,6 +66,20 @@ function startNode(host, port, formId) {
         var field = form[i];
         fields[field.name] = field.value;
     }
-    xmlhttp.open("GET", "/node/start?host=" + host + "&port=" + port + "&params=" + form[0].value, true);
+    xmlhttp.open("GET", "/hub/startNode?host=" + host + "&port=" + port + "&params=" + form[0].value, true);
+    xmlhttp.send();
+}
+
+function stopNode(host, port) {
+    var xmlhttp;
+    xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            showToast("Node stopped");
+            reloadElement('#info');
+            fixUrl();
+        }
+    };
+    xmlhttp.open("GET", "/hub/stopNode?host=" + host + "&port=" + port, true);
     xmlhttp.send();
 }

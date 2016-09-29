@@ -12,9 +12,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,35 +36,20 @@ public class GridNodeResource {
     @GET
     @Timed
     @Path("/start")
-    public String startNode(@QueryParam("host") String host, @QueryParam("port") int port, @QueryParam("params") String params) {
-        String mode = configuration.getMode();
+    public String startNode(@QueryParam("params") String params) {
         node = new Node(HostHelper.getHostName(), HostHelper.getPort(configuration), false);
-        if (mode.equals("node")) {
-            if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
-                return "Node not started. " + configuration.getSeleniumJarFileName() + " not found";
-            } else {
-                try {
-                    process = Runtime.getRuntime().exec(params);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                node.setRunning(true);
-                node.setStartCommand(params);
-                return "Node started with start command " + params;
+        if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
+            return "Node not started. " + configuration.getSeleniumJarFileName() + " not found";
+        } else {
+            try {
+                process = Runtime.getRuntime().exec(params);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }
-        if (mode.equals("hub")) {
-            Client client = ClientBuilder.newClient();
-            WebTarget target = client.target("http://" + host + ":" + port + "/node/start");
-            target
-                    .queryParam("params", params)
-                    .request()
-                    .get();
             node.setRunning(true);
             node.setStartCommand(params);
-            hub.addNode(node);
+            return "Node started with start command " + params;
         }
-        return "Unknown mode";
     }
 
     @GET
