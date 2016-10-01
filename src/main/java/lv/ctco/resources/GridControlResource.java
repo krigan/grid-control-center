@@ -11,6 +11,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
 import static lv.ctco.configuration.GridControlMain.hub;
 
 @Path("/")
@@ -36,5 +40,17 @@ public class GridControlResource {
                                @QueryParam("port") int port) {
         hub.addNode(new Node(host, port, false));
         return "Node registered";
+    }
+
+    @GET
+    @Path("/healthCheck")
+    public boolean pingHost(@QueryParam("host") String host,
+                           @QueryParam("port") int port) {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(host, port));
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
