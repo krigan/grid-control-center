@@ -80,7 +80,14 @@ public class GridHubResource {
     @Timed
     @Path("/status")
     public String statusHub() {
-        return new Gson().toJson(hub);
+        if (process != null) {
+            if (process.isAlive()) {
+                return new Gson().toJson(hub);
+            } else {
+                return "Hub process was stopped, please start selenium node";
+            }
+        }
+        return "Hub wasn't started yet";
     }
 
     @GET

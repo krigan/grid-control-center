@@ -102,8 +102,15 @@ public class GridNodeResource {
     @GET
     @Timed
     @Path("/status")
-    public String statusNode() {
-        return new Gson().toJson(node);
+    public String statusHub() {
+        if (process != null) {
+            if (process.isAlive()) {
+                return new Gson().toJson(hub);
+            } else {
+                return "Selenium process was stopped, please start selenium node";
+            }
+        }
+        return "Node wasn`t started yet";
     }
 
     private void killBrowser(String browser) {
