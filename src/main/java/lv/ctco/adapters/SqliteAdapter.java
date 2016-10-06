@@ -1,10 +1,15 @@
 package lv.ctco.adapters;
 
 import lv.ctco.beans.Hub;
+import lv.ctco.beans.LogItem;
 import lv.ctco.beans.Node;
+import lv.ctco.enums.LogType;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 public class SqliteAdapter {
 
@@ -31,7 +36,7 @@ public class SqliteAdapter {
         return statement;
     }
 
-    public void createDbIfNotExist() {
+    private void createDbIfNotExist() {
         try {
             getStatement().executeUpdate("create table if not EXISTS HUB (" +
                     "id INTEGER PRIMARY KEY, " +
@@ -46,9 +51,54 @@ public class SqliteAdapter {
                     "is_running INTEGER," +
                     "host TEXT," +
                     "port INTEGER);");
+
+            getStatement().executeUpdate("create table if not EXISTS LOGS (" +
+                    "id INTEGER PRIMARY KEY, " +
+                    "log_date INTEGER," +
+                    "log_type TEXT," +
+                    "message TEXT);");
         } catch (SQLException e) {
             System.out.println(e);
         }
+    }
+
+    public void addInfoMessage(String message) {
+        try {
+            PreparedStatement ps;
+            ps = connection.prepareStatement("INSERT INTO LOGS (log_date, log_type, message) VALUES (?,?,?)");
+            ps.setLong(1, new Date().getTime());
+            ps.setString(2, LogType.INFO.name());
+            ps.setString(3, message);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
+    public void addErrorMessage(String message) {
+        try {
+            PreparedStatement ps;
+            ps = connection.prepareStatement("INSERT INTO LOGS (log_date, log_type, message) VALUES (?,?,?)");
+            ps.setLong(1, new Date().getTime());
+            ps.setString(2, LogType.ERROR.name());
+            ps.setString(3, message);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+    }
+
+    public List<LogItem> getLogs() {
+        List<LogItem> logsList = new ArrayList<>();
+        try {
+            ResultSet rs = getStatement().executeQuery("SELECT * FROM LOGS");
+            while (rs.next()) {
+                logsList.add(new LogItem(rs.getLong("log_date"), LogType.valueOf(rs.getString("log_type")), rs.getString("message")));
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return logsList;
     }
 
     public void updateHub(Hub hub) {

@@ -10,6 +10,7 @@ import lv.ctco.beans.Hub;
 import lv.ctco.helpers.HostHelper;
 import lv.ctco.resources.GridControlResource;
 import lv.ctco.resources.GridHubResource;
+import lv.ctco.resources.GridLogResource;
 import lv.ctco.resources.GridNodeResource;
 
 import javax.ws.rs.client.Client;
@@ -46,6 +47,7 @@ public class GridControlMain extends Application<GridControlConfiguration> {
         environment.jersey().register(new GridControlResource(configuration));
         environment.jersey().register(new GridHubResource(configuration));
         environment.jersey().register(new GridNodeResource(configuration));
+        environment.jersey().register(new GridLogResource(configuration));
     }
 
     private void initGrid(GridControlConfiguration configuration) {

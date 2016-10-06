@@ -28,9 +28,11 @@ public class GridNodeResource {
     private Process process;
     private GridControlConfiguration configuration;
     private Node node;
+    private GridLogResource gridLogResource;
 
     public GridNodeResource(GridControlConfiguration configuration) {
         this.configuration = configuration;
+        gridLogResource = new GridLogResource(configuration);
     }
 
     @GET
@@ -49,8 +51,11 @@ public class GridNodeResource {
             if (ProcessHelper.isProcessRunning(process)) {
                 node.setRunning(true);
                 node.setStartCommand(params);
+                gridLogResource.addInfoLog("Node " + node.getHost() + ":" + node.getPort() + " started with params: " + node.getStartCommand());
             } else {
-                throw new IllegalStateException("Unable to start node " + node.getHost() + ":" + node.getPort());
+                String errorMessage = "Unable to start node " + node.getHost() + ":" + node.getPort() + " with params: " + node.getStartCommand();
+                gridLogResource.addErrorLog(errorMessage);
+                throw new IllegalStateException(errorMessage);
             }
             return "Node started with start command " + params;
         }
@@ -64,7 +69,9 @@ public class GridNodeResource {
             process.destroy();
             if (!ProcessHelper.isProcessRunning(process)) {
                 node.setRunning(false);
+                gridLogResource.addInfoLog("Node " + node.getHost() + ":" + node.getPort() + " stopped");
             } else {
+                gridLogResource.addErrorLog("Node " + node.getHost() + ":" + node.getPort() + " was unable to stop.");
                 throw new IllegalStateException("Unable to stop node " + node.getHost() + ":" + node.getPort());
             }
         }

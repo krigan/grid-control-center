@@ -54,7 +54,9 @@ public class GridHubResource {
                 hub.setStartCommand(startCommand);
                 hub.setRunning(true);
                 sqliteAdapter.updateHub(hub);
+                sqliteAdapter.addInfoMessage("Hub started with params: " + hub.getStartCommand());
             } else {
+                sqliteAdapter.addErrorMessage("Unable to start hub with params: " + hub.getStartCommand());
                 throw new IllegalStateException("Unable to start hub");
             }
             return "Hub started with start command " + startCommand;
@@ -70,7 +72,9 @@ public class GridHubResource {
             if (!ProcessHelper.isProcessRunning(process)) {
                 hub.setRunning(false);
                 sqliteAdapter.updateHub(hub);
+                sqliteAdapter.addInfoMessage("Hub stopped");
             } else {
+                sqliteAdapter.addErrorMessage("Unable to stop hub");
                 throw new IllegalStateException("Unable to stop hub");
             }
         }
