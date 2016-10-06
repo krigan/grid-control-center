@@ -10,10 +10,15 @@
           action=""
           name="hubForm"
           method="get">
+        <#if hub.startCommand??>
+            <#assign startCommand=hub.startCommand>
+        <#else>
+            <#assign startCommand="java -jar selenium-server-standalone-2.52.0.jar -role hub -port 4999">
+        </#if>
         <input type="text"
                id="hubParams"
                name="params"
-               value="java -jar selenium-server-standalone-2.52.0.jar -role hub -port 4999"
+               value="${startCommand}"
                style="width: 600px">
         <input type="submit" title="Start hub" value="Start hub"/>
     </form>

@@ -6,6 +6,7 @@ import lv.ctco.adapters.SqliteAdapter;
 import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
+import lv.ctco.helpers.ProcessHelper;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -49,9 +50,13 @@ public class GridHubResource {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            hub.setStartCommand(startCommand);
-            hub.setRunning(true);
-            sqliteAdapter.updateHub(hub);
+            if (ProcessHelper.isProcessRunning(process)) {
+                hub.setStartCommand(startCommand);
+                hub.setRunning(true);
+                sqliteAdapter.updateHub(hub);
+            } else {
+                throw new IllegalStateException("Unable to start hub");
+            }
             return "Hub started with start command " + startCommand;
         }
     }
@@ -62,8 +67,12 @@ public class GridHubResource {
     public String stopHub() {
         if (process != null) {
             process.destroy();
-            hub.setRunning(false);
-            sqliteAdapter.updateHub(hub);
+            if (!ProcessHelper.isProcessRunning(process)) {
+                hub.setRunning(false);
+                sqliteAdapter.updateHub(hub);
+            } else {
+                throw new IllegalStateException("Unable to stop hub");
+            }
         }
         return "Hub stopped";
     }

@@ -7,6 +7,11 @@
           onsubmit="startNode('${node.host}', '${node.port?c}', 'nodeForm_${nodeId}'); return false;"
           method="get"
           action="">
+        <#if node.startCommand??>
+            <#assign startCommand=node.startCommand>
+        <#else>
+            <#assign startCommand="java -jar selenium-server-standalone-2.52.0.jar -role node -timeout 600 -browserTimeout 600 -port 4998 -hub http://LVR51819:4999/grid/register/">
+        </#if>
         <input type="text"
                id="${nodeId}"
                value="java -jar selenium-server-standalone-2.52.0.jar -role node -timeout 600 -browserTimeout 600 -port 4998 -hub http://LVR51819:4999/grid/register/"

@@ -2,11 +2,11 @@ package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.gson.Gson;
-import lv.ctco.adapters.SqliteAdapter;
 import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
 import lv.ctco.helpers.HostHelper;
+import lv.ctco.helpers.ProcessHelper;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -28,10 +28,8 @@ public class GridNodeResource {
     private Process process;
     private GridControlConfiguration configuration;
     private Node node;
-    private SqliteAdapter sqliteAdapter;
 
     public GridNodeResource(GridControlConfiguration configuration) {
-        sqliteAdapter = new SqliteAdapter();
         this.configuration = configuration;
     }
 
@@ -48,8 +46,12 @@ public class GridNodeResource {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            node.setRunning(true);
-            node.setStartCommand(params);
+            if (ProcessHelper.isProcessRunning(process)) {
+                node.setRunning(true);
+                node.setStartCommand(params);
+            } else {
+                throw new IllegalStateException("Unable to start node " + node.getHost() + ":" + node.getPort());
+            }
             return "Node started with start command " + params;
         }
     }
@@ -60,7 +62,11 @@ public class GridNodeResource {
     public String stopNode() {
         if (process != null) {
             process.destroy();
-            node.setRunning(false);
+            if (!ProcessHelper.isProcessRunning(process)) {
+                node.setRunning(false);
+            } else {
+                throw new IllegalStateException("Unable to stop node " + node.getHost() + ":" + node.getPort());
+            }
         }
         return "Node stopped";
     }
