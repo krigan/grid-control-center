@@ -1,7 +1,7 @@
 <#include "common/header.ftl">
 <div id="info">
 <#if hub.running>
-    Hub launched with command: <b>${hub.startParams}</b>
+    Hub launched with command: <b>${hub.startCommand}</b>
     <input type="button" value="Stop hub" onclick="stopHub()">
 <#else>
     Hub not launched yet

@@ -1,7 +1,7 @@
 <li>
 <#if node.running>
     Node is running with params: <b>${node.startCommand}</b>
-    <input type="button" value="Stop hub" onclick="stopNode('${node.host}', '${node.port?c}')"/>
+    <input type="button" value="Stop node" onclick="stopNode('${node.host}', '${node.port?c}')"/>
 <#else>
     <form id="nodeForm_${nodeId}"
           onsubmit="startNode('${node.host}', '${node.port?c}', 'nodeForm_${nodeId}'); return false;"

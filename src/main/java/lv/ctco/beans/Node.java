@@ -13,6 +13,13 @@ public class Node {
         this.isRunning = isRunning;
     }
 
+    public Node(String host, int port, boolean isRunning, String startCommand) {
+        this.host = host;
+        this.port = port;
+        this.isRunning = isRunning;
+        this.startCommand = startCommand;
+    }
+
     public boolean isRunning() {
         return isRunning;
     }

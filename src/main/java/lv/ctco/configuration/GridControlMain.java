@@ -5,6 +5,7 @@ import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
+import lv.ctco.adapters.SqliteAdapter;
 import lv.ctco.beans.Hub;
 import lv.ctco.helpers.HostHelper;
 import lv.ctco.resources.GridControlResource;
@@ -15,7 +16,6 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 public class GridControlMain extends Application<GridControlConfiguration> {
@@ -49,7 +49,6 @@ public class GridControlMain extends Application<GridControlConfiguration> {
     }
 
     private void initGrid(GridControlConfiguration configuration) {
-        hub = new Hub(new HashSet<>());
         if (configuration.getMode().equals("node")) {
             String controlCenterUrl = configuration.getGridControlCenterUrl();
             if (controlCenterUrl == null || controlCenterUrl.isEmpty()) {
@@ -62,6 +61,11 @@ public class GridControlMain extends Application<GridControlConfiguration> {
                     .queryParam("port", HostHelper.getPort(configuration))
                     .request()
                     .get();
+        } else if (configuration.getMode().equals("hub")) {
+            hub = new SqliteAdapter().getHubInfo();
+            if (hub.isRunning()) {
+                new GridHubResource(configuration).startHub(hub.getStartCommand());
+            }
         }
     }
 

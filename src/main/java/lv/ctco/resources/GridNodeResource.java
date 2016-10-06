@@ -2,12 +2,12 @@ package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.gson.Gson;
+import lv.ctco.adapters.SqliteAdapter;
 import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
 import lv.ctco.helpers.HostHelper;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -28,8 +28,10 @@ public class GridNodeResource {
     private Process process;
     private GridControlConfiguration configuration;
     private Node node;
+    private SqliteAdapter sqliteAdapter;
 
     public GridNodeResource(GridControlConfiguration configuration) {
+        sqliteAdapter = new SqliteAdapter();
         this.configuration = configuration;
     }
 
@@ -65,18 +67,6 @@ public class GridNodeResource {
 
     @GET
     @Timed
-    @Path("/restart")
-    public String restartHub(@Nullable @QueryParam("params") String params) throws IOException {
-        process.destroy();
-        node.setRunning(false);
-        hub.removeNode(node);
-        process = Runtime.getRuntime().exec(params);
-        node.setRunning(true);
-        return "Hub restarted";
-    }
-
-    @GET
-    @Timed
     @Path("/closeBrowsers")
     public String closeBrowser(@QueryParam("browser") String browser) {
         switch (browser.toLowerCase()) {
@@ -102,7 +92,7 @@ public class GridNodeResource {
     @GET
     @Timed
     @Path("/status")
-    public String statusHub() {
+    public String statusNode() {
         if (process != null) {
             if (process.isAlive()) {
                 return new Gson().toJson(hub);

@@ -2,11 +2,11 @@ package lv.ctco.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.gson.Gson;
+import lv.ctco.adapters.SqliteAdapter;
 import lv.ctco.beans.Node;
 import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -23,18 +23,20 @@ import static lv.ctco.configuration.GridControlMain.hub;
 @Produces(MediaType.TEXT_HTML)
 public class GridHubResource {
 
+    private static Process process;
     private GridControlConfiguration configuration;
     private String startCommand;
-    private Process process;
+    private SqliteAdapter sqliteAdapter;
 
     public GridHubResource(GridControlConfiguration configuration) {
+        sqliteAdapter = new SqliteAdapter();
         this.configuration = configuration;
     }
 
     @GET
     @Timed
     @Path("/start")
-    public String startHub(@QueryParam("params") String params) throws IOException {
+    public String startHub(@QueryParam("params") String params) {
         if (!FileUtilsHelper.isFileExist(configuration.getSeleniumJarFileName())) {
             return "No selenium jar found";
         } else {
@@ -42,9 +44,14 @@ public class GridHubResource {
                 params = "";
             }
             startCommand = params;
-            process = Runtime.getRuntime().exec(startCommand);
+            try {
+                process = Runtime.getRuntime().exec(startCommand);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             hub.setStartCommand(startCommand);
             hub.setRunning(true);
+            sqliteAdapter.updateHub(hub);
             return "Hub started with start command " + startCommand;
         }
     }
@@ -56,24 +63,9 @@ public class GridHubResource {
         if (process != null) {
             process.destroy();
             hub.setRunning(false);
+            sqliteAdapter.updateHub(hub);
         }
         return "Hub stopped";
-    }
-
-    @GET
-    @Timed
-    @Path("/restart")
-    public String restartHub(@Nullable @QueryParam("params") String params) {
-        process.destroy();
-        hub.setRunning(false);
-        try {
-            startCommand = params;
-            process = Runtime.getRuntime().exec(startCommand);
-            hub.setRunning(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "Hub restarted";
     }
 
     @GET
@@ -105,6 +97,7 @@ public class GridHubResource {
         node.setStartCommand(params);
         hub.removeNode(hub.getNodeList().stream().filter(n -> n.getHost().equals(node.getHost()) && n.getPort() == node.getPort()).findFirst().get());
         hub.addNode(node);
+        sqliteAdapter.updateNode(node);
         return "Node started";
     }
 
@@ -124,14 +117,8 @@ public class GridHubResource {
                 .request()
                 .get();
         node.setRunning(false);
-//        hub.removeNode(hub
-//                .getNodeList()
-//                .stream()
-//                .filter(n -> n.getHost().equals(node.getHost()) && n.getPort() == node.getPort())
-//                .findFirst()
-//                .get());
-//        hub.addNode(node);
-        return "Node started";
+        sqliteAdapter.updateNode(node);
+        return "Node stopped";
     }
 }
 
