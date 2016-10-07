@@ -17,6 +17,7 @@
                value="java -jar selenium-server-standalone-2.52.0.jar -role node -timeout 600 -browserTimeout 600 -port 4998 -hub http://LVR51819:4999/grid/register/"
                style="width: 1000px"/>
         <input type="submit" title="Start node" value="Start node"/>
+        <a class="fancybox" href="/node/takeScreenshot">screenshot</a>
     </form>
 </#if>
 </li>

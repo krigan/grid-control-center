@@ -8,10 +8,7 @@ import io.dropwizard.views.ViewBundle;
 import lv.ctco.adapters.SqliteAdapter;
 import lv.ctco.beans.Hub;
 import lv.ctco.helpers.HostHelper;
-import lv.ctco.resources.GridControlResource;
-import lv.ctco.resources.GridHubResource;
-import lv.ctco.resources.GridLogResource;
-import lv.ctco.resources.GridNodeResource;
+import lv.ctco.resources.*;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -37,6 +34,7 @@ public class GridControlMain extends Application<GridControlConfiguration> {
         bootstrap.addBundle(new ViewBundle());
         Map<String, String> map = new HashMap<>();
         map.put("/assets", "/assets");
+        map.put("/images", "/images");
         bootstrap.addBundle(new ConfiguredAssetsBundle(map));
     }
 
@@ -48,6 +46,7 @@ public class GridControlMain extends Application<GridControlConfiguration> {
         environment.jersey().register(new GridHubResource(configuration));
         environment.jersey().register(new GridNodeResource(configuration));
         environment.jersey().register(new GridLogResource(configuration));
+        environment.jersey().register(new GridImageResource());
     }
 
     private void initGrid(GridControlConfiguration configuration) {

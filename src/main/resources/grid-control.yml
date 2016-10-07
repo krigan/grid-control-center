@@ -10,8 +10,10 @@ os: "windows"
 mode: "node"
 seleniumJarFileName: "selenium-server-standalone-2.52.0.jar"
 gridControlCenterUrl: "http://127.0.0.1:4000"
+screenshotDirPath: "c:/selenium/screenshots/"
 
 assets:
   overrides:
+    /images: c:/selenium/screenshots/
     /assets/css: src/main/resources/assets/css
     /assets/js: src/main/resources/assets/js

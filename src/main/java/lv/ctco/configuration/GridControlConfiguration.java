@@ -30,6 +30,9 @@ public class GridControlConfiguration extends Configuration implements AssetsBun
     @NotEmpty
     @JsonProperty
     private String gridControlCenterUrl;
+    @NotEmpty
+    @JsonProperty
+    private String screenshotDirPath;
 
     @Override
     public AssetsConfiguration getAssetsConfiguration() {
@@ -50,5 +53,9 @@ public class GridControlConfiguration extends Configuration implements AssetsBun
 
     public String getGridControlCenterUrl() {
         return gridControlCenterUrl;
+    }
+
+    public String getScreenshotDirPath() {
+        return screenshotDirPath;
     }
 }

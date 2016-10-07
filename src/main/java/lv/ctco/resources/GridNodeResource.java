@@ -7,17 +7,23 @@ import lv.ctco.configuration.GridControlConfiguration;
 import lv.ctco.helpers.FileUtilsHelper;
 import lv.ctco.helpers.HostHelper;
 import lv.ctco.helpers.ProcessHelper;
+import lv.ctco.views.GridImageView;
 
+import javax.imageio.ImageIO;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static lv.ctco.configuration.GridControlMain.hub;
 
@@ -185,4 +191,21 @@ public class GridNodeResource {
         }
         return result;
     }
+
+    @GET
+    @Timed
+    @Path("/takeScreenshot")
+    public GridImageView takeScreenshot() {
+        BufferedImage image;
+        String screenshotName = null;
+        try {
+            image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+            screenshotName = UUID.randomUUID().toString();
+            ImageIO.write(image, "png", new File(configuration.getScreenshotDirPath() + screenshotName + ".png"));
+        } catch (AWTException | IOException e) {
+            e.printStackTrace();
+        }
+        return new GridImageView(screenshotName);
+    }
+
 }

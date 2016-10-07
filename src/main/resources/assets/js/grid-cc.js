@@ -83,3 +83,9 @@ function stopNode(host, port) {
     xmlhttp.open("GET", "/hub/stopNode?host=" + host + "&port=" + port, true);
     xmlhttp.send();
 }
+
+$(document).ready(function () {
+    $(".fancybox").fancybox({
+        padding: 0
+    });
+});
